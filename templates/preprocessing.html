@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}HR Data Preprocessing Pipeline — Module M2{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <span class="tag tag-accent" style="margin-bottom: 8px;">Module 2 Engineering</span>
+    <h1>HR Data Preprocessing & Feature Engineering</h1>
+    <p>
+      The systematic transformation pipeline from raw corporate HR records into model-ready numerical feature tensors.
+      Adhering to strict training-serving boundary discipline to eliminate leakage and skew.
+    </p>
+  </div>
+
+  <div class="grid-cards" style="margin-bottom: 36px;">
+    <div class="card">
+      <div style="font-size: 1.8rem; margin-bottom: 8px;">1️⃣</div>
+      <h3 class="card-title">Constant Feature Elimination</h3>
+      <p class="card-desc">
+        Identified zero-variance constants (<code>EmployeeCount=1</code>, <code>StandardHours=80</code>, <code>Over18='Y'</code>) 
+        and unique identifier <code>EmployeeNumber</code>, automatically dropping them from the feature space.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="font-size: 1.8rem; margin-bottom: 8px;">2️⃣</div>
+      <h3 class="card-title">Categorical One-Hot Encoding</h3>
+      <p class="card-desc">
+        Nominal attributes (<code>Department</code>, <code>EducationField</code>, <code>JobRole</code>, <code>MaritalStatus</code>, <code>OverTime</code>) 
+        encoded via <strong>OneHotEncoder</strong> with <code>handle_unknown='ignore'</code>.
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="font-size: 1.8rem; margin-bottom: 8px;">3️⃣</div>
+      <h3 class="card-title">Standardization & Scaling</h3>
+      <p class="card-desc">
+        Continuous financial and tenure metrics (<code>MonthlyIncome</code>, <code>DailyRate</code>, <code>TotalWorkingYears</code>) 
+        scaled via <strong>StandardScaler</strong> ($z = \frac{x - \mu}{\sigma}$).
+      </p>
+    </div>
+
+    <div class="card">
+      <div style="font-size: 1.8rem; margin-bottom: 8px;">4️⃣</div>
+      <h3 class="card-title">Class Imbalance Mitigation</h3>
+      <p class="card-desc">
+        With 16.1% turnover rate, balanced class weights ($w_j = \frac{N}{2 N_j}$) are applied across 
+        Logistic Regression and Random Forest models to penalize false negative attrition.
+      </p>
+    </div>
+  </div>
+
+  <div class="visual-grid">
+    <div class="visual-card">
+      <div class="visual-card-header">
+        <h3>Feature Correlation Matrix Heatmap</h3>
+        <p>Bivariate Pearson correlation across employee metrics and attrition outcome</p>
+      </div>
+      <div class="visual-card-body">
+        <img src="{{ url_for('static', filename='generated_plots/m1_correlation_heatmap.png') }}" alt="Correlation Heatmap">
+      </div>
+      <div class="visual-card-footer">
+        Key insight: <code>TotalWorkingYears</code> and <code>JobLevel</code> strongly correlate with <code>MonthlyIncome</code> ($r \approx 0.95$), while <code>OverTime</code> correlates with turnover.
+      </div>
+    </div>
+
+    <div class="visual-card">
+      <div class="visual-card-header">
+        <h3>Missing Values Heatmap & Quality Check</h3>
+        <p>Distribution of null entries prior to pipeline processing</p>
+      </div>
+      <div class="visual-card-body">
+        <img src="{{ url_for('static', filename='generated_plots/m1_missing_values.png') }}" alt="Missing Values Heatmap">
+      </div>
+      <div class="visual-card-footer">
+        Outcome: The HR dataset exhibits zero null values, providing high completeness for predictive modeling.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

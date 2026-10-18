@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Module Visualizations (M1 &ndash; M6) — HR AttritionPredict{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="page-header" style="margin-bottom: 24px;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+      <span class="tag tag-primary">Curriculum M1 &ndash; M6 Deep Dive</span>
+      <span class="tag tag-accent">{{ total_images }} Total Visualizations</span>
+      <span class="tag tag-success">Full Download & High-Res Inspection</span>
+    </div>
+    <h1 style="font-size: 2.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
+      📈 Exploratory Data Analysis & Machine Learning Visualizations
+    </h1>
+    <p style="font-size: 1.02rem; color: var(--text-muted); max-width: 900px; line-height: 1.6;">
+      All <strong>{{ total_images }} output plots and curriculum artifacts</strong> are loaded directly from the project output folders and organized sequentially according to the <strong>Syllabus Modules (M1 to M6)</strong>. Inspect feature distributions, decision trees, clustering projections, ROC/PR curves, and sub-millisecond serving latency benchmarks.
+    </p>
+  </div>
+
+  <!-- Interactive Search & Status Toolbar -->
+  <div class="vis-controls-bar">
+    <div class="vis-search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="visSearchInput" placeholder="Instant search by keyword (e.g. 'Age', 'ROC', 'MonthlyIncome', 'PCA', 'DBSCAN', 'Confusion Matrix')..." oninput="filterVisualizations()" autocomplete="off">
+      <button type="button" id="clearSearchBtn" class="vis-clear-btn" onclick="clearVisSearch()" title="Clear search">&times;</button>
+    </div>
+    <div class="vis-status-box">
+      <span id="visCounterBadge" class="vis-counter-badge">
+        Showing <strong id="visibleCount" style="margin: 0 4px;">{{ total_images }}</strong> of {{ total_images }} Visualizations
+      </span>
+    </div>
+  </div>
+
+  <!-- Syllabus Module Tabs Navigation -->
+  <div class="tabs-nav" style="margin-bottom: 24px;">
+    <button class="tab-btn active" onclick="openModuleTab(event, 'all')">
+      🌟 All Modules ({{ total_images }})
+    </button>
+    {% for mod in modules_data %}
+    <button class="tab-btn" onclick="openModuleTab(event, '{{ mod.code }}')">
+      <span class="tag-mod tag-mod-{{ mod.code|lower }}" style="margin-right: 6px;">{{ mod.code }}</span>
+      {{ mod.badge }} ({{ mod.total_images }})
+    </button>
+    {% endfor %}
+  </div>
+
+  <!-- Module Sections in Syllabus Order (M1 -> M2 -> M3 -> M4 -> M5 -> M6) -->
+  <div id="visModulesContainer">
+    {% for mod in modules_data %}
+    <section class="module-section" id="{{ mod.tab_id }}" data-module="{{ mod.code }}" style="margin-bottom: 48px;">
+      <!-- Module Header Banner -->
+      <div class="module-header" style="border-left: 5px solid {{ mod.color }};">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <span class="module-badge module-badge-{{ mod.code|lower }}">{{ mod.badge }}</span>
+            <h2 style="font-size: 1.55rem; font-weight: 800; color: var(--text-main); margin-top: 6px; margin-bottom: 6px;">
+              {{ mod.title }}
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0;">
+              {{ mod.subtitle }}
+            </p>
+          </div>
+          <div>
+            <span class="vis-counter-badge" style="background: var(--bg-alt); color: var(--text-main); border: 1px solid var(--border);">
+              {{ mod.total_images }} Outputs
+            </span>
+          </div>
+        </div>
+
+        <!-- Quick Jump Pills for Subgroups within Module -->
+        {% if mod.subgroups|length > 1 %}
+        <div class="vis-quick-jumps">
+          <span class="vis-quick-jumps-label">Jump to:</span>
+          {% for sg in mod.subgroups %}
+          <a href="#{{ sg.id }}" class="vis-jump-chip">
+            {{ sg.title }} ({{ sg.images|length }})
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Specific M1 Architecture Diagram -->
+      {% if mod.code == 'M1' %}
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; color: var(--text-main);">
+          The 8-Stage Machine Learning Lifecycle
+        </h3>
+        <div class="lifecycle-diagram">
+          <div class="lifecycle-step"><div class="step-num">Stage 1</div><div class="step-title">Raw Ingestion</div></div>
+          <div class="lifecycle-arrow">&rarr;</div>
+          <div class="lifecycle-step"><div class="step-num">Stage 2</div><div class="step-title">Cleaned Data</div></div>
+          <div class="lifecycle-arrow">&rarr;</div>
+          <div class="lifecycle-step"><div class="step-num">Stage 3</div><div class="step-title">Feature Pipeline</div></div>
+          <div class="lifecycle-arrow">&rarr;</div>
+          <div class="lifecycle-step"><div class="step-num">Stage 4</div><div class="step-title">Model Training</div></div>
+          <div class="lifecycle-arrow">&rarr;</div>
+          <div class="lifecycle-step"><div class="step-num">Stage 5</div><div class="step-title">Artifact (.pkl)</div></div>
+          <div class="lifecycle-arrow">&rarr;</div>
+          <div class="lifecycle-step"><div class="step-num">Stage 6</div><div class="step-title">Serving Endpoint</div></div>
+          <div class="lifecycle-arrow">&rarr;</div>
+          <div class="lifecycle-step"><div class="step-num">Stage 7</div><div class="step-title">Prod Monitoring</div></div>
+          <div class="lifecycle-arrow">&rarr;</div>
+          <div class="lifecycle-step"><div class="step-num">Stage 8</div><div class="step-title">Retraining Loop</div></div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Specific M6 Checklist -->
+      {% if mod.code == 'M6' %}
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px; color: var(--text-main);">
+          Production Serving & MLOps Checklist
+        </h3>
+        <ul style="list-style: none; line-height: 1.9; font-size: 0.92rem; color: var(--text-main); padding-left: 0;">
+          <li>✅ <strong>Pipeline Encapsulation:</strong> Preprocessor + Estimator serialized together in <code>.pkl</code> to avoid missing-transform bugs.</li>
+          <li>✅ <strong>Class-Weight Balancing:</strong> Adjusted loss penalty weights to account for the 16.1% baseline turnover rate.</li>
+          <li>✅ <strong>Docker Containerization:</strong> Packaged in lightweight <code>Dockerfile</code> with production Gunicorn WSGI server.</li>
+          <li>✅ <strong>MLflow Tracking:</strong> Hyperparameters, metrics, and models registered in MLflow Model Registry for lineage tracking.</li>
+        </ul>
+      </div>
+      {% endif %}
+
+      <!-- Subgroups -->
+      {% for sg in mod.subgroups %}
+      <div class="vis-subgroup" id="{{ sg.id }}">
+        <div class="vis-subgroup-header">
+          <div class="vis-subgroup-title">
+            <span>{{ sg.title }}</span>
+            <span class="vis-subgroup-count">{{ sg.images|length }} images</span>
+          </div>
+          {% if sg.description %}
+          <div class="vis-subgroup-desc">{{ sg.description }}</div>
+          {% endif %}
+        </div>
+
+        <div class="visual-grid">
+          {% for image in sg.images %}
+          <div class="visual-card" data-search-text="{{ image.name|lower }} {{ image.group_name|lower }} {{ image.module|lower }} {{ image.subfolder|lower }} {{ image.filename|lower }}">
+            <div class="visual-card-header">
+              <div class="visual-card-tags">
+                <span class="tag-mod tag-mod-{{ image.module|lower }}">{{ image.module }}</span>
+                <span class="tag-subfolder" title="{{ image.group_name }}">{{ image.group_name }}</span>
+              </div>
+              <div class="visual-card-title" title="{{ image.name }}">{{ image.name }}</div>
+            </div>
+
+            <div class="visual-card-body" onclick="openLightbox('{{ image.preview_url }}', '{{ image.download_url }}', '{{ image.name|escape }}', '{{ image.module }}', '{{ image.group_name|escape }}')">
+              <img src="{{ image.preview_url }}" alt="{{ image.name }}" loading="lazy" decoding="async">
+              <span class="visual-card-zoom-hint">🔍 Click to zoom</span>
+            </div>
+
+            {% if image.notes %}
+            <div class="visual-card-notes">
+              {{ image.notes }}
+            </div>
+            {% endif %}
+
+            <div class="visual-card-footer">
+              <button type="button" class="btn btn-secondary" onclick="openLightbox('{{ image.preview_url }}', '{{ image.download_url }}', '{{ image.name|escape }}', '{{ image.module }}', '{{ image.group_name|escape }}')">
+                🔍 View Full
+              </button>
+              <a href="{{ image.download_url }}" download class="btn btn-primary">
+                ⬇️ Download
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+    {% endfor %}
+  </div>
+
+  <!-- No Results Fallback Message -->
+  <div id="visNoResults" style="display: none; text-align: center; padding: 60px 20px; background: #ffffff; border-radius: var(--radius-lg); border: 1px solid var(--border); margin: 30px 0;">
+    <div style="font-size: 3rem; margin-bottom: 12px;">🔍</div>
+    <h3 style="font-size: 1.3rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">No matching visualizations found</h3>
+    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 18px;">Try searching for a different attribute, model name, or metric keyword.</p>
+    <button type="button" class="btn btn-primary" onclick="clearVisSearch()">Clear Search Filter</button>
+  </div>
+</div>
+
+<!-- High Resolution Fullscreen Lightbox Modal -->
+<div id="visLightbox" class="vis-lightbox-overlay" onclick="closeLightbox(event)">
+  <div class="vis-lightbox-content" onclick="event.stopPropagation()">
+    <div class="vis-lightbox-header">
+      <div class="vis-lightbox-title-wrap">
+        <div>
+          <span id="lightboxBadge" class="tag tag-primary"></span>
+          <span id="lightboxGroup" class="tag tag-secondary" style="margin-left: 6px;"></span>
+        </div>
+        <h3 id="lightboxTitle"></h3>
+      </div>
+      <button type="button" class="vis-lightbox-close" onclick="closeLightbox()" title="Close (Escape)">&times;</button>
+    </div>
+    <div class="vis-lightbox-body">
+      <img id="lightboxImage" src="" alt="Full Preview">
+    </div>
+    <div class="vis-lightbox-footer">
+      <div style="font-size: 0.85rem; color: var(--text-muted);">
+        💡 Press <kbd style="background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">Esc</kbd> to close lightbox
+      </div>
+      <div class="vis-lightbox-footer-actions">
+        <a id="lightboxNewTab" href="" target="_blank" class="btn btn-secondary">
+          🔗 Open in New Tab
+        </a>
+        <a id="lightboxDownload" href="" download class="btn btn-primary">
+          ⬇️ Download Image
+        </a>
+        <button type="button" class="btn btn-outline" onclick="closeLightbox()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Back to Top Button -->
+<button type="button" id="visBackTopBtn" class="vis-back-top-btn" onclick="scrollToTop()" title="Back to top">
+  &uarr;
+</button>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentModuleFilter = 'all';
+
+function openModuleTab(evt, moduleCode) {
+  currentModuleFilter = moduleCode;
+
+  // Update tab buttons
+  const buttons = document.querySelectorAll('.tabs-nav .tab-btn');
+  buttons.forEach(b => b.classList.remove('active'));
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add('active');
+  }
+
+  // Filter sections
+  const sections = document.querySelectorAll('.module-section');
+  sections.forEach(section => {
+    if (moduleCode === 'all' || section.getAttribute('data-module') === moduleCode) {
+      section.style.display = 'block';
+    } else {
+      section.style.display = 'none';
+    }
+  });
+
+  // Reapply current search filter
+  filterVisualizations();
+
+  // Update hash without jumping
+  if (moduleCode !== 'all') {
+    history.replaceState(null, null, `#tab-${moduleCode.toLowerCase()}`);
+  } else {
+    history.replaceState(null, null, window.location.pathname);
+  }
+}
+
+function filterVisualizations() {
+  const query = document.getElementById('visSearchInput').value.trim().toLowerCase();
+  const clearBtn = document.getElementById('clearSearchBtn');
+  clearBtn.style.display = query ? 'block' : 'none';
+
+  let totalVisible = 0;
+  const sections = document.querySelectorAll('.module-section');
+
+  sections.forEach(section => {
+    const isModuleActive = (currentModuleFilter === 'all' || section.getAttribute('data-module') === currentModuleFilter);
+    if (!isModuleActive) {
+      section.style.display = 'none';
+      return;
+    }
+
+    let sectionHasVisibleCards = false;
+    const subgroups = section.querySelectorAll('.vis-subgroup');
+
+    subgroups.forEach(sg => {
+      let subgroupHasVisibleCards = false;
+      const cards = sg.querySelectorAll('.visual-card');
+
+      cards.forEach(card => {
+        const text = card.getAttribute('data-search-text') || '';
+        const matches = !query || text.includes(query);
+        if (matches) {
+          card.style.display = 'flex';
+          subgroupHasVisibleCards = true;
+          totalVisible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      sg.style.display = subgroupHasVisibleCards ? 'block' : 'none';
+      if (subgroupHasVisibleCards) {
+        sectionHasVisibleCards = true;
+      }
+    });
+
+    section.style.display = sectionHasVisibleCards ? 'block' : 'none';
+  });
+
+  // Update counter
+  document.getElementById('visibleCount').textContent = totalVisible;
+  const noResults = document.getElementById('visNoResults');
+  noResults.style.display = (totalVisible === 0) ? 'block' : 'none';
+}
+
+function clearVisSearch() {
+  const input = document.getElementById('visSearchInput');
+  input.value = '';
+  filterVisualizations();
+  input.focus();
+}
+
+// Lightbox Modal Functions
+function openLightbox(previewUrl, downloadUrl, title, moduleCode, groupName) {
+  const modal = document.getElementById('visLightbox');
+  const img = document.getElementById('lightboxImage');
+  const titleEl = document.getElementById('lightboxTitle');
+  const badgeEl = document.getElementById('lightboxBadge');
+  const groupEl = document.getElementById('lightboxGroup');
+  const newTabEl = document.getElementById('lightboxNewTab');
+  const downloadEl = document.getElementById('lightboxDownload');
+
+  img.src = previewUrl;
+  titleEl.textContent = title;
+  badgeEl.textContent = moduleCode;
+  badgeEl.className = 'tag tag-mod tag-mod-' + moduleCode.toLowerCase();
+  groupEl.textContent = groupName;
+  newTabEl.href = previewUrl;
+  downloadEl.href = downloadUrl;
+
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if (e && e.target && e.target.id !== 'visLightbox' && !e.target.classList.contains('vis-lightbox-close') && e.target.tagName !== 'BUTTON') {
+    return;
+  }
+  const modal = document.getElementById('visLightbox');
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Keyboard ESC to close lightbox
+document.addEventListener('keydown', function(evt) {
+  if (evt.key === 'Escape') {
+    const modal = document.getElementById('visLightbox');
+    if (modal && modal.classList.contains('active')) {
+      closeLightbox();
+    }
+  }
+});
+
+// Scroll to Top
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('scroll', function() {
+  const btn = document.getElementById('visBackTopBtn');
+  if (window.scrollY > 400) {
+    btn.classList.add('visible');
+  } else {
+    btn.classList.remove('visible');
+  }
+});
+
+// Handle URL hash on initial load
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash.toLowerCase();
+  if (hash && hash.startsWith('#tab-m')) {
+    const modCode = hash.replace('#tab-', '').toUpperCase();
+    const targetBtn = Array.from(document.querySelectorAll('.tabs-nav .tab-btn'))
+      .find(b => b.textContent.includes(modCode));
+    if (targetBtn) {
+      openModuleTab({ currentTarget: targetBtn }, modCode);
+      return;
+    }
+  }
+  // Default is 'all'
+  openModuleTab(null, 'all');
+});
+</script>
+{% endblock %}

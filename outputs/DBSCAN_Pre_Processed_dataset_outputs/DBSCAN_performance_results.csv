@@ -1,0 +1,16 @@
+Metric,Value
+Algorithm,DBSCAN
+Input Dataset,final_preprocess.csv
+Original Dataset Rows,1470
+Rows Used,1470
+Rows Removed,0
+Number of Features,3
+Features Used,"Age, TotalWorkingYears, MonthlyIncome"
+Scaling Method,StandardScaler
+DBSCAN eps,0.8
+DBSCAN min_samples,10
+Number of Clusters,1
+Noise Points,2
+Clustered Points,1468
+Noise Percentage,0.14
+Clustered Percentage,99.86

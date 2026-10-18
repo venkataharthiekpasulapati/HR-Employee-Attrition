@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}{{ model.name }} — Complete Outputs & Metrics{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div style="margin-bottom: 20px;">
+    <a href="{{ url_for('models') }}" style="color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.9rem;">
+      &larr; Back to All Models Leaderboard
+    </a>
+  </div>
+
+  <!-- Header Card -->
+  <div class="card" style="margin-bottom: 24px;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <span class="tag-mod tag-mod-{{ model.module|lower }}">{{ model.module }}</span>
+          <span class="tag tag-accent">{{ model.type }}</span>
+          {% if model.category_name %}
+            <span class="tag tag-secondary">{{ model.category_name }}</span>
+          {% endif %}
+        </div>
+        <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
+          {{ model.name }}
+        </h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 850px; line-height: 1.6;">
+          {{ model.description }}
+        </p>
+      </div>
+      <div>
+        {% if model.category == 'classification' %}
+          <a href="{{ url_for('prediction') }}?model={{ model.id }}" class="btn btn-primary">
+            ⚡ Predict with this Model &rarr;
+          </a>
+        {% else %}
+          <a href="{{ url_for('visualization') }}#tab-{{ model.module|lower }}" class="btn btn-primary">
+            📈 Explore {{ model.module }} Visualizations &rarr;
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if model.formula %}
+    <div style="background: var(--bg-alt); border-radius: var(--radius-md); padding: 14px 18px; margin-top: 18px; border-left: 3px solid var(--primary);">
+      <div style="font-size: 0.78rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">
+        Mathematical Objective / Formulation
+      </div>
+      <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; color: var(--primary); font-weight: 600;">
+        {{ model.formula }}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- KPI Cards -->
+  {% if model.confusion_matrix %}
+    <!-- Classification KPI Cards -->
+    <div class="grid-cards" style="margin-bottom: 30px;">
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Accuracy</div>
+          <div class="kpi-val" style="color: #059669;">{{ (model.accuracy * 100)|round(2) }}%</div>
+          <div class="kpi-sub">Overall Test Correctness</div>
+        </div>
+        <div class="kpi-icon" style="background: #d1fae5; color: #059669;">🎯</div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">F1-Score</div>
+          <div class="kpi-val" style="color: var(--primary);">{{ (model.f1_score * 100)|round(2) }}%</div>
+          <div class="kpi-sub">Harmonic Mean (Prec & Rec)</div>
+        </div>
+        <div class="kpi-icon" style="background: #e0e7ff; color: #4338ca;">⚖️</div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">ROC-AUC</div>
+          <div class="kpi-val" style="color: #0284c7;">{{ model.roc_auc|round(4) }}</div>
+          <div class="kpi-sub">Discrimination Ability</div>
+        </div>
+        <div class="kpi-icon" style="background: #e0f2fe; color: #0284c7;">📈</div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Precision / Recall</div>
+          <div class="kpi-val" style="font-size: 1.4rem;">
+            {{ (model.precision * 100)|round(1) }}% / {{ (model.recall * 100)|round(1) }}%
+          </div>
+          <div class="kpi-sub">Attrition Class Metrics</div>
+        </div>
+        <div class="kpi-icon" style="background: #fef3c7; color: #d97706;">🔍</div>
+      </div>
+    </div>
+
+    <!-- Classification Plots -->
+    <div class="visual-grid" style="margin-bottom: 30px;">
+      <div class="visual-card">
+        <div class="visual-card-header">
+          <div class="visual-card-title">Confusion Matrix Output</div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Actual vs Predicted Attrition labels on holdout test set</p>
+        </div>
+        <div class="visual-card-body">
+          {% if model.cm_plot %}
+            <img src="{{ url_for('static', filename='generated_plots/' + model.cm_plot) }}" alt="Confusion Matrix">
+          {% endif %}
+        </div>
+        <div class="visual-card-footer">
+          <span style="font-size: 0.82rem;">
+            TN: {{ model.confusion_matrix.tn }} &bull; FP: {{ model.confusion_matrix.fp }} &bull; FN: {{ model.confusion_matrix.fn }} &bull; TP: {{ model.confusion_matrix.tp }}
+          </span>
+        </div>
+      </div>
+
+      <div class="visual-card">
+        <div class="visual-card-header">
+          <div class="visual-card-title">Receiver Operating Characteristic (ROC)</div>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">True Positive Rate vs False Positive Rate across all thresholds</p>
+        </div>
+        <div class="visual-card-body">
+          {% if model.roc_plot %}
+            <img src="{{ url_for('static', filename='generated_plots/' + model.roc_plot) }}" alt="ROC Curve">
+          {% endif %}
+        </div>
+        <div class="visual-card-footer">
+          <span style="font-size: 0.82rem;">
+            Area Under Curve (AUC) = <strong>{{ model.roc_auc|round(4) }}</strong>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    {% if model.feat_plot %}
+    <div class="visual-card" style="margin-bottom: 30px;">
+      <div class="visual-card-header">
+        <div class="visual-card-title">Feature Importances / Coefficient Weights</div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Top attributes influencing {{ model.short_name }} classification</p>
+      </div>
+      <div class="visual-card-body">
+        <img src="{{ url_for('static', filename='generated_plots/' + model.feat_plot) }}" alt="Feature Importance">
+      </div>
+      <div class="visual-card-footer">
+        <span style="font-size: 0.82rem;">Notice how <code>OverTime</code>, <code>MonthlyIncome</code>, <code>Age</code>, and <code>TotalWorkingYears</code> are decisive.</span>
+      </div>
+    </div>
+    {% endif %}
+
+  {% else %}
+    <!-- Generic / Unsupervised / CV / Regularization KPI Cards -->
+    <div class="grid-cards" style="margin-bottom: 30px;">
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">{{ model.key_metric_label|default('Benchmark Metric') }}</div>
+          <div class="kpi-val" style="color: #059669;">{{ model.key_metric_val|default('N/A') }}</div>
+          <div class="kpi-sub">Primary Objective Result</div>
+        </div>
+        <div class="kpi-icon" style="background: #d1fae5; color: #059669;">🎯</div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Curriculum Module</div>
+          <div class="kpi-val" style="color: var(--primary);">{{ model.module }}</div>
+          <div class="kpi-sub">Syllabus Sequence</div>
+        </div>
+        <div class="kpi-icon" style="background: #e0e7ff; color: #4338ca;">📚</div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Algorithm Category</div>
+          <div class="kpi-val" style="font-size: 1.25rem; color: #0284c7;">{{ model.category_name|default(model.type) }}</div>
+          <div class="kpi-sub">Methodology Class</div>
+        </div>
+        <div class="kpi-icon" style="background: #e0f2fe; color: #0284c7;">🔬</div>
+      </div>
+
+      <div class="kpi-card">
+        <div>
+          <div class="kpi-label">Output Artifacts</div>
+          <div class="kpi-val" style="color: #d97706;">{{ model.visual_plots|length }} Visuals</div>
+          <div class="kpi-sub">Rendered & Downloadable</div>
+        </div>
+        <div class="kpi-icon" style="background: #fef3c7; color: #d97706;">📈</div>
+      </div>
+    </div>
+
+    <!-- Visual Plots Gallery for Model -->
+    {% if model.visual_plots %}
+    <div style="margin-bottom: 30px;">
+      <h3 style="font-size: 1.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 16px;">
+        Generated Model Plots & Diagnostic Outputs
+      </h3>
+      <div class="visual-grid">
+        {% for p in model.visual_plots %}
+        <div class="visual-card">
+          <div class="visual-card-header">
+            <div class="visual-card-title">{{ p.title }}</div>
+            {% if p.desc %}
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">{{ p.desc }}</p>
+            {% endif %}
+          </div>
+          <div class="visual-card-body">
+            <img src="{{ p.url }}" alt="{{ p.title }}" loading="lazy">
+          </div>
+          <div class="visual-card-footer">
+            <a href="{{ p.url }}" target="_blank" class="btn btn-secondary btn-sm">🔍 View Full</a>
+            <a href="{{ p.url }}" download class="btn btn-primary btn-sm">⬇️ Download</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <!-- Hyperparameters & Code Implementation Layout -->
+  <div class="prediction-layout" style="margin-bottom: 30px;">
+    {% if model.hyperparams %}
+    <div class="card">
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px;">Model Parameters & Specifications</h3>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr><th>Parameter Name</th><th>Configured Value</th></tr>
+          </thead>
+          <tbody>
+            {% for param_name, param_val in model.hyperparams.items() %}
+            <tr><td><code>{{ param_name }}</code></td><td><strong>{{ param_val }}</strong></td></tr>
+            {% endfor %}
+            {% if model.train_time_sec %}
+              <tr><td><code>train_time</code></td><td>{{ model.train_time_sec }} seconds</td></tr>
+            {% endif %}
+            {% if model.inference_latency_ms %}
+              <tr><td><code>inference_latency</code></td><td>{{ model.inference_latency_ms }} ms / sample</td></tr>
+            {% endif %}
+            {% if model.source_script %}
+              <tr><td><code>source_script</code></td><td><code>{{ model.source_script }}</code></td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <h3 style="font-size: 1.15rem; font-weight: 800; margin-bottom: 12px;">
+        {% if model.category == 'classification' %}Production Serving Pipeline{% else %}Python Implementation Code{% endif %}
+      </h3>
+      <div class="code-block" style="font-size: 0.8rem;">
+{% if model.code_snippet %}{{ model.code_snippet }}{% else %}import pickle
+import pandas as pd
+
+# Load serialized model pipeline
+with open("models/{{ model.id }}.pkl", "rb") as f:
+    pipeline = pickle.load(f)
+
+# Evaluate sample employee instance
+payload = pd.DataFrame([{
+    'Age': 32, 'BusinessTravel': 'Travel_Rarely', 'DailyRate': 650,
+    'Department': 'Sales', 'DistanceFromHome': 18, 'Education': 3,
+    'EducationField': 'Life Sciences', 'EnvironmentSatisfaction': 2,
+    'Gender': 'Male', 'HourlyRate': 55, 'JobInvolvement': 2,
+    'JobLevel': 1, 'JobRole': 'Sales Executive', 'JobSatisfaction': 2,
+    'MaritalStatus': 'Single', 'MonthlyIncome': 3200, 'MonthlyRate': 12000,
+    'NumCompaniesWorked': 4, 'OverTime': 'Yes', 'PercentSalaryHike': 12,
+    'PerformanceRating': 3, 'RelationshipSatisfaction': 2,
+    'StockOptionLevel': 0, 'TotalWorkingYears': 5,
+    'TrainingTimesLastYear': 2, 'WorkLifeBalance': 2,
+    'YearsAtCompany': 2, 'YearsInCurrentRole': 1,
+    'YearsSinceLastPromotion': 1, 'YearsWithCurrManager': 1
+}])
+
+prob = pipeline.predict_proba(payload)[0][1]
+print(f"Predicted Attrition Risk: {prob * 100:.2f}%"){% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

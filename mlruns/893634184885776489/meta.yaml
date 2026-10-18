@@ -1,0 +1,9 @@
+artifact_location: file:///Users/khvsaieswar/Desktop/HR_Employee_Attrition/mlruns/893634184885776489
+creation_time: 1791968332469
+effective_trace_archival_retention: null
+experiment_id: '893634184885776489'
+last_update_time: 1791968332469
+lifecycle_stage: active
+name: HR_Employee_Attrition_Benchmark
+trace_location: null
+workspace: default

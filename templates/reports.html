@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Technical Reports & Module Synthesis — HR Attrition{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <span class="tag tag-primary" style="margin-bottom: 8px;">Technical Synthesis</span>
+    <h1>HR Employee Attrition Technical Report</h1>
+    <p>
+      Executive summary of empirical findings, curriculum module takeaways (M1 &ndash; M6), and production deployment guidelines.
+    </p>
+  </div>
+
+  <div class="grid-cards" style="margin-bottom: 36px;">
+    <div class="card">
+      <span class="tag tag-success" style="margin-bottom: 8px;">Recommended Champion Model</span>
+      <h3 style="font-size: 1.3rem; font-weight: 800; color: #059669; margin-bottom: 6px;">Gradient Boosting Classifier</h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+        Achieved the highest ROC-AUC of <strong>0.8250</strong> and test accuracy of <strong>85.37%</strong>, capturing non-linear interactions between overtime, commute distance, and monthly salary.
+      </p>
+    </div>
+
+    <div class="card">
+      <span class="tag tag-accent" style="margin-bottom: 8px;">Highest Minority Class Recall</span>
+      <h3 style="font-size: 1.3rem; font-weight: 800; color: #0284c7; margin-bottom: 6px;">Balanced Logistic Regression</h3>
+      <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6;">
+        Achieved <strong>63.83% Recall</strong> on the minority turnover class with sub-millisecond latency. Highly interpretable odds-ratio coefficients for HR policy audits.
+      </p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 30px;">
+    <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 16px;">Curriculum Takeaways Matrix (M1 &ndash; M6)</h3>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Module</th>
+            <th>Core Concept Explored</th>
+            <th>Empirical Finding in HR Dataset</th>
+            <th>Production Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>M1</strong></td>
+            <td>The ML System Lifecycle</td>
+            <td>1,470 employee records ingested with 16.1% baseline turnover.</td>
+            <td>Establishes automated end-to-end retraining pipeline.</td>
+          </tr>
+          <tr>
+            <td><strong>M2</strong></td>
+            <td>Linear Models & Regularization</td>
+            <td>Logistic regression with balanced class weights significantly lifts recall for employees leaving.</td>
+            <td>Interpretable coefficients isolate key turnover factors (Overtime, Income).</td>
+          </tr>
+          <tr>
+            <td><strong>M3</strong></td>
+            <td>Tree-Based Ensembles</td>
+            <td>Gradient Boosting & XGBoost dominate tabular evaluation with &gt;0.82 AUC.</td>
+            <td>High predictive precision prevents false positive alarms in HR retention workflows.</td>
+          </tr>
+          <tr>
+            <td><strong>M4</strong></td>
+            <td>Unsupervised Learning</td>
+            <td>K-Means identified 3 clusters (Executives, Core Stable, Early At-Risk).</td>
+            <td>Enables unsupervised employee segmentation and cohort risk clustering.</td>
+          </tr>
+          <tr>
+            <td><strong>M5</strong></td>
+            <td>Evaluation & Calibration</td>
+            <td>PR-AUC prioritized over simple accuracy to properly evaluate class imbalance.</td>
+            <td>Reliable calibrated probabilities for budgeting retention stock grants.</td>
+          </tr>
+          <tr>
+            <td><strong>M6</strong></td>
+            <td>Production Engineering</td>
+            <td>Packaged into self-contained <code>.pkl</code> pipelines served via Docker container.</td>
+            <td>Sub-3ms serving latency with full MLflow experiment registry.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+Item,Details
+Input Dataset,/Users/khvsaieswar/Desktop/HR_Employee_Attrition/dataset/HR_Employee_Attrition_raw.csv
+Output Folder,/Users/khvsaieswar/Desktop/HR_Employee_Attrition/outputs/DBSCAN_Raw_dataset_outputs
+Original Dataset Modified,NO
+Features Used,"Age, TotalWorkingYears, MonthlyIncome"
+Preprocessing,Raw dataset with numeric extraction & cleaning
+Scaling,StandardScaler
+Algorithm,DBSCAN
+eps,0.8
+min_samples,10

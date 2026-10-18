@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  hr-attrition-predict:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hr-attrition-prediction-system:latest
+    container_name: hr_attrition_prediction_service
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - FLASK_ENV=production
+    restart: unless-stopped

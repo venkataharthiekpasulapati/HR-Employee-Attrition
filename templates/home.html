@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}HR Employee Attrition Prediction System{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">👥 Enterprise ML System (Modules M1 &ndash; M6)</div>
+    <h1>Predict Employee Attrition & Retention with <span>Machine Learning</span></h1>
+    <p>
+      An enterprise HR intelligence platform trained on 1,470 employee records. Featuring regularized linear models, 
+      ensemble trees, unsupervised employee segmentation, probability calibration, and production ML serving.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('prediction') }}" class="btn btn-primary" style="padding: 14px 28px; font-size: 1.05rem;">
+        ⚡ Predict Employee Attrition Risk
+      </a>
+      <a href="{{ url_for('models') }}" class="btn btn-secondary" style="padding: 14px 28px; font-size: 1.05rem;">
+        📊 View Models & Accuracy
+      </a>
+      <a href="{{ url_for('visualization') }}" class="btn btn-secondary" style="padding: 14px 28px; font-size: 1.05rem;">
+        📈 Module Visualizations (M1-M6)
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="container">
+  <div class="grid-cards" style="margin-bottom: 40px;">
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Benchmark Dataset</div>
+        <div class="kpi-val">1,470</div>
+        <div class="kpi-sub">35 Attributes &bull; 16.1% Attrition Baseline</div>
+      </div>
+      <div class="kpi-icon" style="background: #e0e7ff; color: #4338ca;">👥</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Top Model Accuracy</div>
+        <div class="kpi-val" style="color: #059669;">86.39%</div>
+        <div class="kpi-sub">XGBoost &bull; 0.8250 AUC</div>
+      </div>
+      <div class="kpi-icon" style="background: #d1fae5; color: #059669;">🎯</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Trained ML Models</div>
+        <div class="kpi-val">6 Models</div>
+        <div class="kpi-sub">Linear, Bagging & Boosting Ensembles</div>
+      </div>
+      <div class="kpi-icon" style="background: #e0f2fe; color: #0284c7;">🤖</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Serving Latency</div>
+        <div class="kpi-val">< 3 ms</div>
+        <div class="kpi-sub">Sub-millisecond Real-Time Inference</div>
+      </div>
+      <div class="kpi-icon" style="background: #fef3c7; color: #d97706;">⚡</div>
+    </div>
+  </div>
+
+  <!-- Curriculum Architecture M1 - M6 -->
+  <div class="page-header" style="margin-bottom: 20px;">
+    <h2>Academic Modules Architecture (M1 &ndash; M6)</h2>
+    <p>Comprehensive coverage of curriculum components adapted for human capital attrition modeling.</p>
+  </div>
+
+  <div class="grid-cards" style="margin-bottom: 50px;">
+    <div class="card">
+      <span class="tag tag-primary" style="margin-bottom: 12px;">Module 1</span>
+      <h3 class="card-title">AttritionPredict as a System</h3>
+      <p class="card-desc">
+        End-to-end ML lifecycle, supervised binary classification split, inference tracing, and training-serving skew prevention.
+      </p>
+      <div style="margin-top: 16px;">
+        <a href="{{ url_for('visualization') }}#tab-m1" class="btn btn-secondary btn-sm">Explore M1 Visuals &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag tag-accent" style="margin-bottom: 12px;">Module 2</span>
+      <h3 class="card-title">Linear Models & Regularization</h3>
+      <p class="card-desc">
+        Logistic regression with sigmoid activation, cross-entropy loss, L1/L2 regularization, and feature standardisation.
+      </p>
+      <div style="margin-top: 16px;">
+        <a href="{{ url_for('visualization') }}#tab-m2" class="btn btn-secondary btn-sm">Explore M2 Visuals &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag tag-success" style="margin-bottom: 12px;">Module 3</span>
+      <h3 class="card-title">Tree-Based Ensembles</h3>
+      <p class="card-desc">
+        Decision trees with Gini Impurity, Random Forests bagging, AdaBoost, Gradient Boosting, and XGBoost on tabular HR data.
+      </p>
+      <div style="margin-top: 16px;">
+        <a href="{{ url_for('visualization') }}#tab-m3" class="btn btn-secondary btn-sm">Explore M3 Visuals &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag tag-warning" style="margin-bottom: 12px;">Module 4</span>
+      <h3 class="card-title">Unsupervised Learning</h3>
+      <p class="card-desc">
+        K-Means clustering with Elbow Method, PCA dimensionality reduction, and Isolation Forest anomaly detection.
+      </p>
+      <div style="margin-top: 16px;">
+        <a href="{{ url_for('visualization') }}#tab-m4" class="btn btn-secondary btn-sm">Explore M4 Visuals &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag tag-primary" style="margin-bottom: 12px;">Module 5</span>
+      <h3 class="card-title">Evaluation & Calibration</h3>
+      <p class="card-desc">
+        Stratified holdout splits, confusion matrices, multi-model ROC & PR curves under class imbalance (~16% turnover rate).
+      </p>
+      <div style="margin-top: 16px;">
+        <a href="{{ url_for('visualization') }}#tab-m5" class="btn btn-secondary btn-sm">Explore M5 Visuals &rarr;</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="tag tag-accent" style="margin-bottom: 12px;">Module 6</span>
+      <h3 class="card-title">Production ML Engineering</h3>
+      <p class="card-desc">
+        Notebook-to-production rituals, model packaging (.pkl & joblib), Docker containerization, and MLflow experiment tracking.
+      </p>
+      <div style="margin-top: 16px;">
+        <a href="{{ url_for('visualization') }}#tab-m6" class="btn btn-secondary btn-sm">Explore M6 Visuals &rarr;</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard Snapshot -->
+  <div class="card" style="margin-bottom: 40px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+      <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800;">Trained HR Models Leaderboard</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">Evaluation results on stratified holdout employee test records.</p>
+      </div>
+      <a href="{{ url_for('models') }}" class="btn btn-primary btn-sm">View All Models & Full Outputs &rarr;</a>
+    </div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Model Name</th>
+            <th>Type</th>
+            <th>Accuracy</th>
+            <th>Precision</th>
+            <th>Recall</th>
+            <th>F1 Score</th>
+            <th>ROC-AUC</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m_id, m in models_summary.items() if m.accuracy is defined %}
+          <tr>
+            <td><strong>{{ m.name }}</strong></td>
+            <td><span class="tag tag-primary">{{ m.type }}</span></td>
+            <td><strong>{{ (m.accuracy * 100)|round(2) }}%</strong></td>
+            <td>{{ (m.precision * 100)|round(2) }}%</td>
+            <td>{{ (m.recall * 100)|round(2) }}%</td>
+            <td><strong style="color: var(--primary);">{{ (m.f1_score * 100)|round(2) }}%</strong></td>
+            <td><span class="tag tag-success">{{ m.roc_auc|round(3) }}</span></td>
+            <td>
+              <a href="{{ url_for('model_detail', model_id=m_id) }}" class="btn btn-secondary btn-sm">
+                View Outputs &rarr;
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

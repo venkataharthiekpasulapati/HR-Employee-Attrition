@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/khvsaieswar/Desktop/HR_Employee_Attrition/mlruns/893634184885776489/46c6f33325a5471bae72892b14974dd6/artifacts
+end_time: 1791968336339
+entry_point_name: ''
+experiment_id: '893634184885776489'
+lifecycle_stage: active
+run_id: 46c6f33325a5471bae72892b14974dd6
+run_name: Gradient_Boosting_Champion
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1791968332599
+status: 3
+tags: []
+user_id: khvsaieswar

@@ -1,0 +1,10 @@
+artifact_location: file:///Users/khvsaieswar/Desktop/HR_Employee_Attrition/mlruns/893634184885776489/models/m-63aabc5ce69148039fc72e3877fb3fd0/artifacts
+creation_timestamp: 1791968333179
+experiment_id: '893634184885776489'
+last_updated_timestamp: 1791968336321
+model_id: m-63aabc5ce69148039fc72e3877fb3fd0
+model_type: null
+name: model
+source_run_id: 46c6f33325a5471bae72892b14974dd6
+status: 2
+status_message: null

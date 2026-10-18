@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Employee Attrition Risk Prediction — HR AttritionPredict{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <span class="tag tag-danger" style="margin-bottom: 8px;">Real-Time Inference Service</span>
+    <h1>Employee Attrition & Retention Predictor</h1>
+    <p>
+      Select any trained machine learning model, input employee compensation, satisfaction, and work parameters, 
+      and predict turnover risk along with key drivers and retention recommendations.
+    </p>
+  </div>
+
+  <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+    <div style="font-size: 0.9rem; font-weight: 600; color: var(--text-muted);">
+      💡 Quick Test Presets:
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="loadPreset('high_risk')">
+        🔴 Load High-Risk Employee Profile
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="loadPreset('loyal')">
+        🟢 Load Loyal / Retained Profile
+      </button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="loadPreset('average')">
+        🟡 Load Average Employee Profile
+      </button>
+    </div>
+  </div>
+
+  <div class="prediction-layout">
+    <div class="form-card">
+      <form action="{{ url_for('prediction') }}" method="POST" id="predictionForm" style="margin: 0;">
+        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 20px; color: var(--text-main);">
+          Employee Profile Attributes
+        </h3>
+
+        <div class="form-group" style="background: var(--primary-light); padding: 14px 16px; border-radius: var(--radius-md); margin-bottom: 20px;">
+          <label for="model_select" style="color: var(--primary); font-weight: 700; margin-bottom: 6px;">
+            🤖 Select ML Classifier Model:
+          </label>
+          <select name="model_id" id="model_select" class="form-control" style="font-weight: 600;">
+            {% for m_id, m in models_summary.items() %}
+              <option value="{{ m_id }}" {% if selected_model == m_id %}selected{% endif %}>
+                {{ m.name }} &bull; (Acc: {{ (m.accuracy * 100)|round(1) }}%, F1: {{ (m.f1_score * 100)|round(1) }}%)
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="age">Age *</label>
+            <input type="number" min="18" max="65" name="age" id="age" value="{{ form_data.age|default('32') }}" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="monthly_income">Monthly Income ($) *</label>
+            <input type="number" min="1000" max="30000" name="monthly_income" id="monthly_income" value="{{ form_data.monthly_income|default('4200') }}" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="overtime">OverTime Required? *</label>
+            <select name="overtime" id="overtime" class="form-control">
+              <option value="Yes" {% if form_data.overtime == 'Yes' %}selected{% endif %}>Yes (Frequent Overtime)</option>
+              <option value="No" {% if form_data.overtime == 'No' or not form_data.overtime %}selected{% endif %}>No (Standard Hours)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="department">Department</label>
+            <select name="department" id="department" class="form-control">
+              <option value="Research & Development" {% if form_data.department == 'Research & Development' %}selected{% endif %}>Research & Development</option>
+              <option value="Sales" {% if form_data.department == 'Sales' %}selected{% endif %}>Sales</option>
+              <option value="Human Resources" {% if form_data.department == 'Human Resources' %}selected{% endif %}>Human Resources</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="job_role">Job Role</label>
+            <select name="job_role" id="job_role" class="form-control">
+              <option value="Sales Executive" {% if form_data.job_role == 'Sales Executive' %}selected{% endif %}>Sales Executive</option>
+              <option value="Research Scientist" {% if form_data.job_role == 'Research Scientist' %}selected{% endif %}>Research Scientist</option>
+              <option value="Laboratory Technician" {% if form_data.job_role == 'Laboratory Technician' %}selected{% endif %}>Laboratory Technician</option>
+              <option value="Manufacturing Director" {% if form_data.job_role == 'Manufacturing Director' %}selected{% endif %}>Manufacturing Director</option>
+              <option value="Healthcare Representative" {% if form_data.job_role == 'Healthcare Representative' %}selected{% endif %}>Healthcare Representative</option>
+              <option value="Manager" {% if form_data.job_role == 'Manager' %}selected{% endif %}>Manager</option>
+              <option value="Research Director" {% if form_data.job_role == 'Research Director' %}selected{% endif %}>Research Director</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="distance_from_home">Distance From Home (Miles)</label>
+            <input type="number" min="1" max="50" name="distance_from_home" id="distance_from_home" value="{{ form_data.distance_from_home|default('8') }}" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="job_satisfaction">Job Satisfaction (1&ndash;4)</label>
+            <select name="job_satisfaction" id="job_satisfaction" class="form-control">
+              <option value="1" {% if form_data.job_satisfaction == '1' %}selected{% endif %}>1 - Low</option>
+              <option value="2" {% if form_data.job_satisfaction == '2' %}selected{% endif %}>2 - Medium</option>
+              <option value="3" {% if form_data.job_satisfaction == '3' or not form_data.job_satisfaction %}selected{% endif %}>3 - High</option>
+              <option value="4" {% if form_data.job_satisfaction == '4' %}selected{% endif %}>4 - Very High</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="work_life_balance">Work-Life Balance (1&ndash;4)</label>
+            <select name="work_life_balance" id="work_life_balance" class="form-control">
+              <option value="1" {% if form_data.work_life_balance == '1' %}selected{% endif %}>1 - Bad</option>
+              <option value="2" {% if form_data.work_life_balance == '2' %}selected{% endif %}>2 - Good</option>
+              <option value="3" {% if form_data.work_life_balance == '3' or not form_data.work_life_balance %}selected{% endif %}>3 - Better</option>
+              <option value="4" {% if form_data.work_life_balance == '4' %}selected{% endif %}>4 - Best</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="years_at_company">Years At Company</label>
+            <input type="number" min="0" max="40" name="years_at_company" id="years_at_company" value="{{ form_data.years_at_company|default('3') }}" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="years_with_curr_manager">Years With Current Manager</label>
+            <input type="number" min="0" max="30" name="years_with_curr_manager" id="years_with_curr_manager" value="{{ form_data.years_with_curr_manager|default('2') }}" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="stock_option_level">Stock Option Level (0&ndash;3)</label>
+            <input type="number" min="0" max="3" name="stock_option_level" id="stock_option_level" value="{{ form_data.stock_option_level|default('1') }}" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="business_travel">Business Travel</label>
+            <select name="business_travel" id="business_travel" class="form-control">
+              <option value="Travel_Rarely" {% if form_data.business_travel == 'Travel_Rarely' %}selected{% endif %}>Travel Rarely</option>
+              <option value="Travel_Frequently" {% if form_data.business_travel == 'Travel_Frequently' %}selected{% endif %}>Travel Frequently</option>
+              <option value="Non-Travel" {% if form_data.business_travel == 'Non-Travel' %}selected{% endif %}>Non-Travel</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 20px; padding: 14px; font-size: 1.05rem;">
+          🚀 Run Attrition Risk Inference
+        </button>
+      </form>
+    </div>
+
+    <!-- Result Card -->
+    <div class="result-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <span class="tag tag-primary" style="font-size: 0.8rem;">Prediction Output</span>
+        <span style="font-size: 0.82rem; color: var(--text-muted);">
+          Model: <strong>{{ result.model_name|default('Gradient Boosting') }}</strong>
+        </span>
+      </div>
+
+      {% if result %}
+        <div class="result-badge-container {% if result.is_attrited == 1 %}unplaced{% else %}placed{% endif %}">
+          <div style="font-size: 3rem; line-height: 1; margin-bottom: 6px;">
+            {% if result.is_attrited == 1 %}⚠️{% else %}🛡️{% endif %}
+          </div>
+          <div class="result-status-title">
+            {{ result.status }}
+          </div>
+          <div style="font-size: 0.95rem; font-weight: 600; color: {% if result.is_attrited == 1 %}#991b1b{% else %}#065f46{% endif %};">
+            {% if result.is_attrited == 1 %}
+              High probability of employee quitting &bull; Immediate retention actions needed
+            {% else %}
+              Low turnover probability &bull; Employee profile stable and engaged
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="probability-meter-wrapper">
+          <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 700; margin-bottom: 6px;">
+            <span>Attrition Probability</span>
+            <span style="color: {% if result.is_attrited == 1 %}#dc2626{% else %}#059669{% endif %};">
+              {{ result.probability }}%
+            </span>
+          </div>
+          <div class="probability-meter-bg">
+            <div class="probability-meter-fill {% if result.is_attrited == 1 %}unplaced{% else %}placed{% endif %}" 
+                 style="width: {{ result.probability }}%;"></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main);">
+            Key Risk Drivers:
+          </h4>
+          <ul class="factors-list risk">
+            {% for risk in result.risk_factors %}
+              <li>✕ {{ risk }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main);">
+            Key Retention Factors:
+          </h4>
+          <ul class="factors-list positive">
+            {% for factor in result.retention_factors %}
+              <li>✓ {{ factor }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; color: var(--text-main);">
+            HR Recommendations:
+          </h4>
+          <div style="background: var(--bg-alt); padding: 12px 14px; border-radius: var(--radius-md); font-size: 0.85rem; line-height: 1.6;">
+            {% for rec in result.recommendations %}
+              <div style="margin-bottom: 4px;">&bull; {{ rec }}</div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div style="text-align: center;">
+          <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm" style="width: 100%;">
+            📊 View Analytics in Dashboard &rarr;
+          </a>
+        </div>
+      {% else %}
+        <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+          <div style="font-size: 3rem; margin-bottom: 12px;">👥</div>
+          <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+            Awaiting Employee Input
+          </h4>
+          <p style="font-size: 0.88rem; line-height: 1.5;">
+            Fill in the parameters on the left or click one of the quick test presets above to trigger real-time attrition prediction.
+          </p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function loadPreset(type) {
+  if (type === 'high_risk') {
+    document.getElementById('age').value = 29;
+    document.getElementById('monthly_income').value = 2800;
+    document.getElementById('overtime').value = 'Yes';
+    document.getElementById('department').value = 'Sales';
+    document.getElementById('job_role').value = 'Sales Executive';
+    document.getElementById('distance_from_home').value = 24;
+    document.getElementById('job_satisfaction').value = '1';
+    document.getElementById('work_life_balance').value = '1';
+    document.getElementById('years_at_company').value = 1;
+    document.getElementById('years_with_curr_manager').value = 0;
+    document.getElementById('stock_option_level').value = 0;
+    document.getElementById('business_travel').value = 'Travel_Frequently';
+  } else if (type === 'loyal') {
+    document.getElementById('age').value = 46;
+    document.getElementById('monthly_income').value = 14500;
+    document.getElementById('overtime').value = 'No';
+    document.getElementById('department').value = 'Research & Development';
+    document.getElementById('job_role').value = 'Manager';
+    document.getElementById('distance_from_home').value = 4;
+    document.getElementById('job_satisfaction').value = '4';
+    document.getElementById('work_life_balance').value = '3';
+    document.getElementById('years_at_company').value = 12;
+    document.getElementById('years_with_curr_manager').value = 6;
+    document.getElementById('stock_option_level').value = 2;
+    document.getElementById('business_travel').value = 'Travel_Rarely';
+  } else if (type === 'average') {
+    document.getElementById('age').value = 36;
+    document.getElementById('monthly_income').value = 6200;
+    document.getElementById('overtime').value = 'No';
+    document.getElementById('department').value = 'Research & Development';
+    document.getElementById('job_role').value = 'Research Scientist';
+    document.getElementById('distance_from_home').value = 7;
+    document.getElementById('job_satisfaction').value = '3';
+    document.getElementById('work_life_balance').value = '3';
+    document.getElementById('years_at_company').value = 5;
+    document.getElementById('years_with_curr_manager').value = 3;
+    document.getElementById('stock_option_level').value = 1;
+    document.getElementById('business_travel').value = 'Travel_Rarely';
+  }
+}
+</script>
+{% endblock %}

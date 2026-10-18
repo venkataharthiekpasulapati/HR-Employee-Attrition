@@ -1,0 +1,405 @@
+{% extends "base.html" %}
+
+{% block title %}ML Models (Strict Module-Wise Sequence M2 &ndash; M5) — HR AttritionPredict{% endblock %}
+
+{% block content %}
+<div class="container">
+  <!-- Page Header -->
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+    <div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+        <span class="tag tag-primary">Syllabus Sequence Deep Dive</span>
+        <span class="tag tag-accent">{{ catalog.total_models_count }} Total Models & Frameworks</span>
+        <span class="tag tag-success">Arranged Strictly Module-Wise (M2 &rarr; M5)</span>
+      </div>
+      <h1 style="font-size: 2.1rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
+        🤖 Machine Learning Models & Algorithms (Module-Wise Sequence)
+      </h1>
+      <p style="font-size: 1.02rem; color: var(--text-muted); max-width: 940px; line-height: 1.6;">
+        All <strong>{{ catalog.total_models_count }} machine learning models, ensembles, manifold methods, and cross-validation architectures</strong> are arranged strictly in curriculum sequence: <strong>Module 2</strong> (Models 2.1&ndash;2.5), <strong>Module 3</strong> (Models 3.1&ndash;3.5), <strong>Module 4</strong> (Models 4.1&ndash;4.6), and <strong>Module 5</strong> (Model 5.1). There is zero random mixing.
+      </p>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="{{ url_for('visualization') }}" class="btn btn-secondary">
+        📈 Explore 212 Visualizations &rarr;
+      </a>
+      <a href="{{ url_for('prediction') }}" class="btn btn-primary">
+        ⚡ Run Live Prediction &rarr;
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Cards Overview -->
+  <div class="grid-cards" style="margin-bottom: 30px;">
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">M2: Top Regularized Model</div>
+        <div class="kpi-val" style="color: #4f46e5;">87.76%</div>
+        <div class="kpi-sub">Ridge L2 Regularization (Model 2.3)</div>
+      </div>
+      <div class="kpi-icon" style="background: #e0e7ff; color: #4f46e5;">📐</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">M3: Top Classification Accuracy</div>
+        <div class="kpi-val" style="color: #059669;">86.39%</div>
+        <div class="kpi-sub">XGBoost Classifier (Model 3.5)</div>
+      </div>
+      <div class="kpi-icon" style="background: #d1fae5; color: #059669;">🏆</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">M4: Manifold & Dimensionality</div>
+        <div class="kpi-val" style="color: #d97706;">PCA & t-SNE</div>
+        <div class="kpi-sub">32 Features &rarr; 95% Var. (Models 4.1 &amp; 4.2)</div>
+      </div>
+      <div class="kpi-icon" style="background: #fef3c7; color: #d97706;">🌐</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">M5: Cross-Validation Stability</div>
+        <div class="kpi-val" style="color: #0284c7;">5-Fold Stratified</div>
+        <div class="kpi-sub">Mean ROC-AUC: 0.7840 (Model 5.1)</div>
+      </div>
+      <div class="kpi-icon" style="background: #e0f2fe; color: #0284c7;">🔄</div>
+    </div>
+  </div>
+
+  <!-- Interactive Search & Status Toolbar -->
+  <div class="vis-controls-bar">
+    <div class="vis-search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="modelSearchInput" placeholder="Instant search models by name, keyword, or math (e.g. 'Decision Tree', 'PCA', 't-SNE', 'XGBoost', 'Lasso', 'Cross-Validation', 'K-Means')..." oninput="filterModels()" autocomplete="off">
+      <button type="button" id="clearModelSearchBtn" class="vis-clear-btn" onclick="clearModelSearch()" title="Clear search">&times;</button>
+    </div>
+    <div class="vis-status-box">
+      <span id="modelCounterBadge" class="vis-counter-badge">
+        Showing <strong id="visibleModelCount" style="margin: 0 4px;">{{ catalog.total_models_count }}</strong> of {{ catalog.total_models_count }} Models
+      </span>
+    </div>
+
+    <!-- Quick Jumps -->
+    <div class="vis-quick-jumps" style="width: 100%; margin-top: 10px;">
+      <span class="vis-quick-jumps-label">Quick Jump:</span>
+      {% for mod in catalog.modules %}
+      <a href="#{{ mod.tab_id }}" class="vis-jump-chip" onclick="switchModuleTab(null, '{{ mod.code }}')">
+        <span class="tag-mod tag-mod-{{ mod.code|lower }}" style="font-size: 0.72rem; padding: 1px 6px;">{{ mod.code }}</span>
+        {{ mod.badge }} ({{ mod.range }})
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Module Filter Tabs (Module-Wise Sequence M2 -> M3 -> M4 -> M5) -->
+  <div class="tabs-nav" style="margin-bottom: 28px;">
+    <button class="tab-btn active" onclick="switchModuleTab(event, 'all')">
+      🌟 All Modules ({{ catalog.total_models_count }} Models)
+    </button>
+    {% for mod in catalog.modules %}
+    <button class="tab-btn" onclick="switchModuleTab(event, '{{ mod.code }}')">
+      <span class="tag-mod tag-mod-{{ mod.code|lower }}" style="margin-right: 6px;">{{ mod.code }}</span>
+      {{ mod.badge }} &bull; {{ mod.range }} ({{ mod.count }})
+    </button>
+    {% endfor %}
+  </div>
+
+  <!-- MODULE SECTIONS IN STRICT SYLLABUS ORDER: M2 -> M3 -> M4 -> M5 -->
+  <div id="modelsModuleContainer">
+    {% for mod in catalog.modules %}
+    <section class="module-models-section" id="{{ mod.tab_id }}" data-module="{{ mod.code }}" style="margin-bottom: 50px;">
+      <!-- Module Header Banner -->
+      <div class="module-header" style="border-left: 5px solid {{ mod.color }};">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span class="module-badge module-badge-{{ mod.code|lower }}">{{ mod.badge }}</span>
+              <span class="range-pill">{{ mod.range }}</span>
+            </div>
+            <h2 style="font-size: 1.55rem; font-weight: 800; color: var(--text-main); margin-top: 6px; margin-bottom: 6px;">
+              {{ mod.title }}
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0;">
+              {{ mod.subtitle }}
+            </p>
+          </div>
+          <div>
+            <span class="vis-counter-badge" style="background: var(--bg-alt); color: var(--text-main); border: 1px solid var(--border);">
+              {{ mod.count }} Models in Sequence
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Module Models Comparison Table (Strict Sequence) -->
+      <div class="card module-table-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin: 0;">
+            {{ mod.badge }} ({{ mod.range }}) Comparison &amp; Specifications
+          </h3>
+          <span class="tag tag-primary">{{ mod.count }} Evaluated</span>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 70px;">Seq</th>
+                <th>Model / Framework</th>
+                <th>Curriculum</th>
+                <th>Architecture / Methodology</th>
+                <th>Mathematical Formulation / Objective</th>
+                <th>Key Benchmark / Metric</th>
+                <th>Source / Parameters</th>
+                <th style="width: 140px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for m in mod.models %}
+              <tr class="model-row" data-search="{{ m.name|lower }} {{ m.id|lower }} {{ m.type|lower }} {{ m.seq_num|lower }} {{ m.module|lower }}">
+                <td>
+                  <span class="tag-seq">{{ m.seq_num }}</span>
+                </td>
+                <td>
+                  <div style="font-weight: 700; color: var(--text-main); font-size: 0.95rem;">
+                    {{ m.name }}
+                  </div>
+                  <span style="font-size: 0.78rem; color: var(--text-muted);">ID: <code>{{ m.id }}</code></span>
+                </td>
+                <td>
+                  <span class="tag-mod tag-mod-{{ m.module|lower }}">{{ m.module }}</span>
+                </td>
+                <td>
+                  <span style="font-size: 0.85rem; color: var(--text-muted);">{{ m.type }}</span>
+                </td>
+                <td>
+                  <code style="font-size: 0.82rem; color: var(--primary);">{{ m.formula }}</code>
+                </td>
+                <td>
+                  {% if m.accuracy is defined and m.confusion_matrix is defined %}
+                    <strong style="color: #059669; font-size: 0.95rem;">Acc: {{ (m.accuracy * 100)|round(2) }}%</strong>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">AUC: {{ m.roc_auc|round(4) }}</div>
+                  {% else %}
+                    <span class="tag tag-success" style="font-weight: 700;">
+                      {{ m.key_metric_label }}: {{ m.key_metric_val }}
+                    </span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if m.source_script %}
+                    <code style="font-size: 0.76rem;">{{ m.source_script.split('/')[-1] }}</code>
+                  {% elif m.hyperparams %}
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">{{ m.hyperparams|length }} parameters</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <a href="{{ url_for('model_detail', model_id=m.id) }}" class="btn btn-primary btn-sm">
+                    View Outputs &rarr;
+                  </a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Module Models Grid Cards with Details & Visuals -->
+      <div class="visual-grid">
+        {% for m in mod.models %}
+        <div class="visual-card model-card" data-search="{{ m.name|lower }} {{ m.id|lower }} {{ m.type|lower }} {{ m.seq_num|lower }} {{ m.module|lower }}">
+          <div class="visual-card-header">
+            <div class="visual-card-tags">
+              <span class="tag-seq">{{ m.seq_num }}</span>
+              <span class="tag-mod tag-mod-{{ m.module|lower }}">{{ m.module }}</span>
+              <span class="tag-subfolder">{{ m.category_name|default(m.type) }}</span>
+            </div>
+            <div class="visual-card-title">{{ m.name }}</div>
+          </div>
+
+          {% if m.visual_plots and m.visual_plots|length > 0 %}
+          <div class="visual-card-body" onclick="window.location.href='{{ url_for('model_detail', model_id=m.id) }}'">
+            <img src="{{ m.visual_plots[0].url }}" alt="{{ m.visual_plots[0].title }}" loading="lazy">
+            <span class="visual-card-zoom-hint">🔍 View Model Outputs</span>
+          </div>
+          {% elif m.cm_plot %}
+          <div class="visual-card-body" onclick="window.location.href='{{ url_for('model_detail', model_id=m.id) }}'">
+            <img src="{{ url_for('static', filename='generated_plots/' + m.cm_plot) }}" alt="Confusion Matrix" loading="lazy">
+            <span class="visual-card-zoom-hint">🔍 View Confusion Matrix</span>
+          </div>
+          {% else %}
+          <div class="visual-card-body" style="background: #f1f5f9; text-align: center; color: var(--text-muted);" onclick="window.location.href='{{ url_for('model_detail', model_id=m.id) }}'">
+            <div>
+              <div style="font-size: 2.2rem; margin-bottom: 6px;">📐</div>
+              <div style="font-weight: 700; font-size: 0.85rem;">{{ m.type }}</div>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="visual-card-notes">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted);">{{ m.type }}</span>
+              <span class="tag tag-success" style="font-size: 0.75rem; font-weight: 700;">
+                {% if m.accuracy is defined and m.confusion_matrix is defined %}
+                  Acc: {{ (m.accuracy * 100)|round(1) }}%
+                {% else %}
+                  {{ m.key_metric_label }}: {{ m.key_metric_val }}
+                {% endif %}
+              </span>
+            </div>
+            <p style="margin-bottom: 8px; font-size: 0.86rem; color: var(--text-muted); line-height: 1.45;">{{ m.description[:125] }}...</p>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: var(--primary); background: var(--bg-alt); padding: 4px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); overflow-x: auto; white-space: nowrap;">
+              {{ m.formula }}
+            </div>
+          </div>
+
+          <div class="visual-card-footer">
+            {% if m.category == 'classification' %}
+              <a href="{{ url_for('prediction') }}?model={{ m.id }}" class="btn btn-secondary">
+                ⚡ Predict
+              </a>
+            {% endif %}
+            <a href="{{ url_for('model_detail', model_id=m.id) }}" class="btn btn-primary" style="flex: 1; text-align: center;">
+              View Outputs &rarr;
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentModuleFilter = 'all';
+
+function switchModuleTab(evt, moduleCode) {
+  currentModuleFilter = moduleCode;
+
+  // Update button active state
+  const buttons = document.querySelectorAll('.tabs-nav .tab-btn');
+  buttons.forEach(b => {
+    b.classList.remove('active');
+    if (moduleCode === 'all' && b.textContent.includes('All Modules')) {
+      b.classList.add('active');
+    } else if (moduleCode !== 'all' && b.textContent.includes(moduleCode)) {
+      b.classList.add('active');
+    }
+  });
+  if (evt && evt.currentTarget) {
+    buttons.forEach(b => b.classList.remove('active'));
+    evt.currentTarget.classList.add('active');
+  }
+
+  // Toggle sections
+  const sections = document.querySelectorAll('.module-models-section');
+  sections.forEach(sec => {
+    if (moduleCode === 'all' || sec.getAttribute('data-module') === moduleCode) {
+      sec.style.display = 'block';
+    } else {
+      sec.style.display = 'none';
+    }
+  });
+
+  // Re-run search filtering if query exists
+  filterModels();
+
+  // Update hash
+  if (moduleCode !== 'all') {
+    history.replaceState(null, null, `#mod-${moduleCode.toLowerCase()}`);
+  } else {
+    history.replaceState(null, null, window.location.pathname);
+  }
+}
+
+function filterModels() {
+  const query = (document.getElementById('modelSearchInput').value || '').trim().toLowerCase();
+  const clearBtn = document.getElementById('clearModelSearchBtn');
+  if (clearBtn) {
+    clearBtn.style.display = query ? 'block' : 'none';
+  }
+
+  let visibleCount = 0;
+  const sections = document.querySelectorAll('.module-models-section');
+
+  sections.forEach(sec => {
+    const secModule = sec.getAttribute('data-module');
+    const isModuleActive = (currentModuleFilter === 'all' || currentModuleFilter === secModule);
+
+    if (!isModuleActive) {
+      sec.style.display = 'none';
+      return;
+    }
+
+    let secMatches = 0;
+
+    // Filter table rows
+    const rows = sec.querySelectorAll('.model-row');
+    rows.forEach(r => {
+      const searchData = r.getAttribute('data-search') || '';
+      if (!query || searchData.includes(query)) {
+        r.style.display = '';
+        secMatches++;
+      } else {
+        r.style.display = 'none';
+      }
+    });
+
+    // Filter visual cards
+    const cards = sec.querySelectorAll('.model-card');
+    cards.forEach(c => {
+      const searchData = c.getAttribute('data-search') || '';
+      if (!query || searchData.includes(query)) {
+        c.style.display = '';
+      } else {
+        c.style.display = 'none';
+      }
+    });
+
+    // Check if table card should hide when no rows match
+    const tableCard = sec.querySelector('.module-table-card');
+    if (tableCard) {
+      tableCard.style.display = (secMatches > 0) ? 'block' : 'none';
+    }
+
+    // Toggle whole section visibility
+    if (secMatches > 0) {
+      sec.style.display = 'block';
+      visibleCount += secMatches;
+    } else {
+      sec.style.display = 'none';
+    }
+  });
+
+  const countBadge = document.getElementById('visibleModelCount');
+  if (countBadge) {
+    countBadge.textContent = visibleCount;
+  }
+}
+
+function clearModelSearch() {
+  const input = document.getElementById('modelSearchInput');
+  if (input) {
+    input.value = '';
+    filterModels();
+    input.focus();
+  }
+}
+
+// Handle URL hash on initial load
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash.toLowerCase();
+  if (hash && hash.startsWith('#mod-m')) {
+    const modCode = hash.replace('#mod-', '').toUpperCase();
+    switchModuleTab(null, modCode);
+    return;
+  }
+  switchModuleTab(null, 'all');
+});
+</script>
+{% endblock %}

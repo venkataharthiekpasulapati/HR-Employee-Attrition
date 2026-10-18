@@ -1,0 +1,3 @@
+Cluster,Cluster_ID,Number_of_Records,Average_Age,Average_TotalWorkingYears,Average_MonthlyIncome
+Noise,-1,2,0.939,1.764,1.567
+Cluster_0,0,1468,-0.001,-0.002,-0.002

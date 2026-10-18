@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}HR Attrition Dashboard — Analytics Telemetry{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <span class="tag tag-primary" style="margin-bottom: 8px;">Analytics & Inference Telemetry</span>
+      <h1>HR Turnover Analytics Dashboard</h1>
+      <p>
+        Real-time telemetry and aggregated visualization of employee attrition evaluations, turnover risk distributions, 
+        and model utilization.
+      </p>
+    </div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <a href="{{ url_for('prediction') }}" class="btn btn-primary btn-sm">+ New Evaluation</a>
+      <form action="{{ url_for('dashboard') }}" method="POST" style="margin: 0; display: inline;">
+        <input type="hidden" name="action" value="clear">
+        <button type="submit" class="btn btn-secondary btn-sm" onclick="return confirm('Clear evaluation telemetry history?');">
+          🗑️ Clear History
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid-cards" style="margin-bottom: 30px;">
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Total Evaluations Logged</div>
+        <div class="kpi-val">{{ analytics.total_predictions }}</div>
+        <div class="kpi-sub">Employees Assessed</div>
+      </div>
+      <div class="kpi-icon" style="background: #e0e7ff; color: #4338ca;">🔢</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Predicted Turnover Rate</div>
+        <div class="kpi-val" style="color: #dc2626;">{{ analytics.attrition_rate }}%</div>
+        <div class="kpi-sub">
+          {{ analytics.attrited_count }} High Risk / {{ analytics.retained_count }} Stable
+        </div>
+      </div>
+      <div class="kpi-icon" style="background: #fee2e2; color: #dc2626;">⚠️</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Average Risk Probability</div>
+        <div class="kpi-val" style="color: #0284c7;">{{ analytics.avg_probability }}%</div>
+        <div class="kpi-sub">Mean Risk Score Across Cohort</div>
+      </div>
+      <div class="kpi-icon" style="background: #e0f2fe; color: #0284c7;">📊</div>
+    </div>
+
+    <div class="kpi-card">
+      <div>
+        <div class="kpi-label">Top Model Selected</div>
+        <div class="kpi-val" style="font-size: 1.3rem;">{{ analytics.top_model }}</div>
+        <div class="kpi-sub">Champion Algorithm</div>
+      </div>
+      <div class="kpi-icon" style="background: #d1fae5; color: #059669;">🏆</div>
+    </div>
+  </div>
+
+  <div class="visual-grid" style="margin-bottom: 36px;">
+    <div class="visual-card">
+      <div class="visual-card-header">
+        <h3>Employee Retention vs Attrition Proportion</h3>
+        <p>Proportion of cohort categorized as Retained vs High Turnover Risk</p>
+      </div>
+      <div class="visual-card-body" style="flex-direction: column; padding: 24px;">
+        {% if analytics.total_predictions > 0 %}
+          <div style="width: 100%; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 700; margin-bottom: 6px;">
+              <span style="color: #059669;">Retained: {{ analytics.retained_count }} ({{ (100 - analytics.attrition_rate)|round(1) }}%)</span>
+              <span style="color: #dc2626;">High Risk: {{ analytics.attrited_count }} ({{ analytics.attrition_rate }}%)</span>
+            </div>
+            <div style="height: 22px; width: 100%; display: flex; border-radius: var(--radius-full); overflow: hidden; background: #e2e8f0;">
+              <div style="width: {{ 100 - analytics.attrition_rate }}%; background: #059669; height: 100%;"></div>
+              <div style="width: {{ analytics.attrition_rate }}%; background: #dc2626; height: 100%;"></div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 20px; font-size: 0.85rem; color: var(--text-muted);">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <div style="width: 12px; height: 12px; background: #059669; border-radius: 3px;"></div>
+              Retained (Stable Workforce)
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <div style="width: 12px; height: 12px; background: #dc2626; border-radius: 3px;"></div>
+              High Risk (Target for Remedial Retention)
+            </div>
+          </div>
+        {% else %}
+          <p style="color: var(--text-muted);">No evaluations logged yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="visual-card">
+      <div class="visual-card-header">
+        <h3>Model Selection Breakdown</h3>
+        <p>Telemetry showing which algorithms are invoked for HR decisions</p>
+      </div>
+      <div class="visual-card-body" style="padding: 24px; flex-direction: column; align-items: stretch;">
+        {% if analytics.model_usage %}
+          {% for m_name, count in analytics.model_usage.items() %}
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px;">
+                <span>{{ m_name }}</span>
+                <span>{{ count }} runs ({{ ((count / analytics.total_predictions) * 100)|round(1) }}%)</span>
+              </div>
+              <div style="height: 8px; width: 100%; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+                <div style="width: {{ (count / analytics.total_predictions) * 100 }}%; background: var(--primary); height: 100%;"></div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p style="color: var(--text-muted); text-align: center;">No model usage data recorded.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Logs Table -->
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+      <div>
+        <h3 style="font-size: 1.25rem; font-weight: 800;">Recent Evaluations Audit Log</h3>
+        <p style="color: var(--text-muted); font-size: 0.88rem;">Live audit trail of employee risk assessments processed by the serving layer.</p>
+      </div>
+      <span class="tag tag-primary">{{ analytics.recent_history|length }} Most Recent Requests</span>
+    </div>
+
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Employee ID</th>
+            <th>Timestamp</th>
+            <th>Model Used</th>
+            <th>Age</th>
+            <th>Department</th>
+            <th>Job Role</th>
+            <th>Monthly Income</th>
+            <th>Overtime</th>
+            <th>Years at Co.</th>
+            <th>Risk Probability</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if analytics.recent_history %}
+            {% for item in analytics.recent_history %}
+            <tr>
+              <td><code>{{ item.id }}</code></td>
+              <td style="color: var(--text-muted); font-size: 0.84rem;">{{ item.timestamp }}</td>
+              <td><strong>{{ item.model_name }}</strong></td>
+              <td>{{ item.age }}</td>
+              <td><span class="tag tag-accent">{{ item.department }}</span></td>
+              <td>{{ item.job_role }}</td>
+              <td><strong>{{ item.monthly_income }}</strong></td>
+              <td>{{ item.overtime }}</td>
+              <td>{{ item.years_at_company }} yrs</td>
+              <td>
+                <strong style="color: {% if item.risk_level == 'High' %}#dc2626{% else %}#059669{% endif %};">
+                  {{ item.probability }}%
+                </strong>
+              </td>
+              <td>
+                {% if item.risk_level == 'High' %}
+                  <span class="tag tag-danger">High Risk</span>
+                {% else %}
+                  <span class="tag tag-success">Retained</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="11" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                No evaluation history available. <a href="{{ url_for('prediction') }}">Run your first prediction</a>.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

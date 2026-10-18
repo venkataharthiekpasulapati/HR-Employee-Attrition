@@ -1,0 +1,16 @@
+Parameter,Value
+Input Dataset,/Users/khvsaieswar/Desktop/HR_Employee_Attrition/dataset/final_preprocess.csv
+Original Number of Records,1470
+Original Number of Columns,35
+Numeric Features Used,32
+Constant Features Removed,3
+Missing Values Before Processing,0
+Missing Values After Processing,0
+t-SNE Output Dimensions,2
+Perplexity,30
+Learning Rate,auto
+Maximum Iterations,1000
+Initialization,PCA
+Random State,42
+KL Divergence,2.0665860176086426
+Final Iteration Count,999

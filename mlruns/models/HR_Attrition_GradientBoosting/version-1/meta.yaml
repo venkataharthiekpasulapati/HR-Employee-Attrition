@@ -1,0 +1,16 @@
+creation_timestamp: 1791968336329
+current_stage: None
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1791968336329
+model_id: m-63aabc5ce69148039fc72e3877fb3fd0
+name: HR_Attrition_GradientBoosting
+run_id: 46c6f33325a5471bae72892b14974dd6
+run_link: null
+source: models:/m-63aabc5ce69148039fc72e3877fb3fd0
+status: READY
+status_message: null
+storage_location: file:///Users/khvsaieswar/Desktop/HR_Employee_Attrition/mlruns/893634184885776489/models/m-63aabc5ce69148039fc72e3877fb3fd0/artifacts
+user_id: null
+version: 1
+workspace: default

@@ -1,0 +1,445 @@
+{
+  "gradient_boosting": {
+    "id": "gradient_boosting",
+    "name": "Gradient Boosting Classifier",
+    "short_name": "Gradient Boosting",
+    "module": "M3",
+    "type": "Ensemble (Boosting)",
+    "description": "Sequential functional gradient descent iteratively fitting shallow regression trees to pseudo-residuals of cross-entropy loss.",
+    "formula": "F_m(x) = F_{m-1}(x) + \\gamma_m h_m(x)",
+    "hyperparams": {
+      "n_estimators": 120,
+      "learning_rate": 0.08,
+      "max_depth": 4,
+      "subsample": 0.85
+    },
+    "train_time_sec": 0.258,
+    "inference_latency_ms": 0.002,
+    "accuracy": 0.8537,
+    "precision": 0.625,
+    "recall": 0.2128,
+    "f1_score": 0.3175,
+    "roc_auc": 0.825,
+    "log_loss": 0.3529,
+    "confusion_matrix": {
+      "tn": 241,
+      "fp": 6,
+      "fn": 37,
+      "tp": 10
+    },
+    "top_features": [
+      {
+        "feature": "Age",
+        "importance": 0.094
+      },
+      {
+        "feature": "MonthlyIncome",
+        "importance": 0.093
+      },
+      {
+        "feature": "TotalWorkingYears",
+        "importance": 0.0746
+      },
+      {
+        "feature": "DailyRate",
+        "importance": 0.0691
+      },
+      {
+        "feature": "DistanceFromHome",
+        "importance": 0.0499
+      },
+      {
+        "feature": "EnvironmentSatisfaction",
+        "importance": 0.0454
+      },
+      {
+        "feature": "HourlyRate",
+        "importance": 0.0449
+      },
+      {
+        "feature": "NumCompaniesWorked",
+        "importance": 0.0418
+      },
+      {
+        "feature": "OverTime_No",
+        "importance": 0.0322
+      },
+      {
+        "feature": "WorkLifeBalance",
+        "importance": 0.03
+      }
+    ],
+    "cm_plot": "gradient_boosting_confusion_matrix.png",
+    "roc_plot": "gradient_boosting_roc_curve.png",
+    "feat_plot": "gradient_boosting_feature_importance.png"
+  },
+  "random_forest": {
+    "id": "random_forest",
+    "name": "Random Forest Classifier",
+    "short_name": "Random Forest",
+    "module": "M3",
+    "type": "Ensemble (Bagging)",
+    "description": "Bagged ensemble of de-correlated decision trees with feature subsampling (\\sqrt{p}) and balanced class weighting.",
+    "formula": "\\hat{f}_{rf}(x) = \frac{1}{B} \\sum_{b=1}^B f_b(x)",
+    "hyperparams": {
+      "n_estimators": 150,
+      "max_depth": 12,
+      "class_weight": "balanced",
+      "n_jobs": -1
+    },
+    "train_time_sec": 0.095,
+    "inference_latency_ms": 0.046,
+    "accuracy": 0.8401,
+    "precision": 0.5,
+    "recall": 0.383,
+    "f1_score": 0.4337,
+    "roc_auc": 0.7946,
+    "log_loss": 0.3967,
+    "confusion_matrix": {
+      "tn": 229,
+      "fp": 18,
+      "fn": 29,
+      "tp": 18
+    },
+    "top_features": [
+      {
+        "feature": "MonthlyIncome",
+        "importance": 0.0725
+      },
+      {
+        "feature": "Age",
+        "importance": 0.0583
+      },
+      {
+        "feature": "TotalWorkingYears",
+        "importance": 0.0551
+      },
+      {
+        "feature": "DailyRate",
+        "importance": 0.0512
+      },
+      {
+        "feature": "YearsAtCompany",
+        "importance": 0.0469
+      },
+      {
+        "feature": "MonthlyRate",
+        "importance": 0.042
+      },
+      {
+        "feature": "HourlyRate",
+        "importance": 0.0416
+      },
+      {
+        "feature": "DistanceFromHome",
+        "importance": 0.0415
+      },
+      {
+        "feature": "NumCompaniesWorked",
+        "importance": 0.037
+      },
+      {
+        "feature": "OverTime_Yes",
+        "importance": 0.0368
+      }
+    ],
+    "cm_plot": "random_forest_confusion_matrix.png",
+    "roc_plot": "random_forest_roc_curve.png",
+    "feat_plot": "random_forest_feature_importance.png"
+  },
+  "xgboost": {
+    "id": "xgboost",
+    "name": "XGBoost Classifier",
+    "short_name": "XGBoost",
+    "module": "M3",
+    "type": "Extreme Gradient Boosting",
+    "description": "Second-order Taylor gradient expansion with histogram-based split finding and L1/L2 leaf regularization.",
+    "formula": "\\mathcal{L}^{(t)} \u0007pprox \\sum [g_i f_t(x_i) + \frac{1}{2} h_i f_t^2(x_i)] + \\Omega(f_t)",
+    "hyperparams": {
+      "n_estimators": 100,
+      "learning_rate": 0.08,
+      "max_depth": 4,
+      "eval_metric": "logloss"
+    },
+    "train_time_sec": 0.088,
+    "inference_latency_ms": 0.006,
+    "accuracy": 0.8639,
+    "precision": 0.7333,
+    "recall": 0.234,
+    "f1_score": 0.3548,
+    "roc_auc": 0.7983,
+    "log_loss": 0.3567,
+    "confusion_matrix": {
+      "tn": 243,
+      "fp": 4,
+      "fn": 36,
+      "tp": 11
+    },
+    "top_features": [
+      {
+        "feature": "TotalWorkingYears",
+        "importance": 0.1131
+      },
+      {
+        "feature": "OverTime_No",
+        "importance": 0.051
+      },
+      {
+        "feature": "StockOptionLevel",
+        "importance": 0.0484
+      },
+      {
+        "feature": "JobLevel",
+        "importance": 0.0481
+      },
+      {
+        "feature": "YearsWithCurrManager",
+        "importance": 0.0426
+      },
+      {
+        "feature": "JobRole_Sales Executive",
+        "importance": 0.0344
+      },
+      {
+        "feature": "EnvironmentSatisfaction",
+        "importance": 0.0311
+      },
+      {
+        "feature": "Department_Sales",
+        "importance": 0.0302
+      },
+      {
+        "feature": "JobRole_Sales Representative",
+        "importance": 0.0289
+      },
+      {
+        "feature": "Age",
+        "importance": 0.0271
+      }
+    ],
+    "cm_plot": "xgboost_confusion_matrix.png",
+    "roc_plot": "xgboost_roc_curve.png",
+    "feat_plot": "xgboost_feature_importance.png"
+  },
+  "logistic_regression": {
+    "id": "logistic_regression",
+    "name": "Logistic Regression (Ridge / L2)",
+    "short_name": "Logistic Reg.",
+    "module": "M2",
+    "type": "Linear Classifier",
+    "description": "Regularized binary classification utilizing sigmoid activation and log-loss minimization over standardized feature hyperplane.",
+    "formula": "P(y=1|X) = \\sigma(w^T X + b) = \frac{1}{1 + e^{-(w^T X + b)}}",
+    "hyperparams": {
+      "penalty": "l2",
+      "C": 0.8,
+      "solver": "lbfgs",
+      "class_weight": "balanced",
+      "max_iter": 500
+    },
+    "train_time_sec": 0.009,
+    "inference_latency_ms": 0.0,
+    "accuracy": 0.7551,
+    "precision": 0.3529,
+    "recall": 0.6383,
+    "f1_score": 0.4545,
+    "roc_auc": 0.8045,
+    "log_loss": 0.4748,
+    "confusion_matrix": {
+      "tn": 192,
+      "fp": 55,
+      "fn": 17,
+      "tp": 30
+    },
+    "top_features": [
+      {
+        "feature": "JobRole_Research Director",
+        "importance": -1.3288
+      },
+      {
+        "feature": "JobRole_Laboratory Technician",
+        "importance": 1.1569
+      },
+      {
+        "feature": "JobRole_Sales Representative",
+        "importance": 1.0447
+      },
+      {
+        "feature": "BusinessTravel_Non-Travel",
+        "importance": -0.9669
+      },
+      {
+        "feature": "OverTime_No",
+        "importance": -0.8738
+      },
+      {
+        "feature": "BusinessTravel_Travel_Frequently",
+        "importance": 0.7849
+      },
+      {
+        "feature": "OverTime_Yes",
+        "importance": 0.7677
+      },
+      {
+        "feature": "EducationField_Other",
+        "importance": -0.7595
+      },
+      {
+        "feature": "EducationField_Human Resources",
+        "importance": 0.6673
+      },
+      {
+        "feature": "JobRole_Healthcare Representative",
+        "importance": -0.6172
+      }
+    ],
+    "cm_plot": "logistic_regression_confusion_matrix.png",
+    "roc_plot": "logistic_regression_roc_curve.png",
+    "feat_plot": "logistic_regression_feature_importance.png"
+  },
+  "decision_tree": {
+    "id": "decision_tree",
+    "name": "Decision Tree Classifier",
+    "short_name": "Decision Tree",
+    "module": "M3",
+    "type": "Tree Model",
+    "description": "Greedy recursive axis-aligned partitioning optimizing Gini Impurity with cost-complexity and maximum depth pre-pruning.",
+    "formula": "I_G(p) = 1 - \\sum_{i=1}^C p_i^2",
+    "hyperparams": {
+      "criterion": "gini",
+      "max_depth": 6,
+      "min_samples_leaf": 8,
+      "class_weight": "balanced"
+    },
+    "train_time_sec": 0.004,
+    "inference_latency_ms": 0.0,
+    "accuracy": 0.7347,
+    "precision": 0.3038,
+    "recall": 0.5106,
+    "f1_score": 0.381,
+    "roc_auc": 0.6548,
+    "log_loss": 0.8975,
+    "confusion_matrix": {
+      "tn": 192,
+      "fp": 55,
+      "fn": 23,
+      "tp": 24
+    },
+    "top_features": [
+      {
+        "feature": "TotalWorkingYears",
+        "importance": 0.174
+      },
+      {
+        "feature": "OverTime_Yes",
+        "importance": 0.1462
+      },
+      {
+        "feature": "NumCompaniesWorked",
+        "importance": 0.1122
+      },
+      {
+        "feature": "Age",
+        "importance": 0.0903
+      },
+      {
+        "feature": "StockOptionLevel",
+        "importance": 0.0886
+      },
+      {
+        "feature": "DailyRate",
+        "importance": 0.063
+      },
+      {
+        "feature": "JobLevel",
+        "importance": 0.0546
+      },
+      {
+        "feature": "DistanceFromHome",
+        "importance": 0.0485
+      },
+      {
+        "feature": "PercentSalaryHike",
+        "importance": 0.0382
+      },
+      {
+        "feature": "MonthlyIncome",
+        "importance": 0.0318
+      }
+    ],
+    "cm_plot": "decision_tree_confusion_matrix.png",
+    "roc_plot": "decision_tree_roc_curve.png",
+    "feat_plot": "decision_tree_feature_importance.png"
+  },
+  "adaboost": {
+    "id": "adaboost",
+    "name": "AdaBoost Classifier",
+    "short_name": "AdaBoost",
+    "module": "M3",
+    "type": "Adaptive Boosting",
+    "description": "Adaptive boosting algorithm adjusting sample weights dynamically to penalize misclassified employee instances with decision stumps.",
+    "formula": "w_{i}^{(m+1)} = w_i^{(m)} \\exp(-\u0007lpha_m y_i h_m(x_i))",
+    "hyperparams": {
+      "n_estimators": 80,
+      "learning_rate": 0.8
+    },
+    "train_time_sec": 0.086,
+    "inference_latency_ms": 0.011,
+    "accuracy": 0.8469,
+    "precision": 0.5455,
+    "recall": 0.2553,
+    "f1_score": 0.3478,
+    "roc_auc": 0.8003,
+    "log_loss": 0.5365,
+    "confusion_matrix": {
+      "tn": 237,
+      "fp": 10,
+      "fn": 35,
+      "tp": 12
+    },
+    "top_features": [
+      {
+        "feature": "TotalWorkingYears",
+        "importance": 0.1361
+      },
+      {
+        "feature": "MonthlyIncome",
+        "importance": 0.0956
+      },
+      {
+        "feature": "JobInvolvement",
+        "importance": 0.0666
+      },
+      {
+        "feature": "NumCompaniesWorked",
+        "importance": 0.0593
+      },
+      {
+        "feature": "Age",
+        "importance": 0.0587
+      },
+      {
+        "feature": "OverTime_Yes",
+        "importance": 0.0496
+      },
+      {
+        "feature": "StockOptionLevel",
+        "importance": 0.0445
+      },
+      {
+        "feature": "EnvironmentSatisfaction",
+        "importance": 0.0395
+      },
+      {
+        "feature": "DistanceFromHome",
+        "importance": 0.0318
+      },
+      {
+        "feature": "DailyRate",
+        "importance": 0.0307
+      }
+    ],
+    "cm_plot": "adaboost_confusion_matrix.png",
+    "roc_plot": "adaboost_roc_curve.png",
+    "feat_plot": "adaboost_feature_importance.png"
+  }
+}
